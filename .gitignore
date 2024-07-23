@@ -2,7 +2,7 @@
 k8s-resource-exporter
 *.csv
 
-./bin/
+./bin/*
 # Other common ignore patterns
 *.log
 *.tmp
