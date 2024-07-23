@@ -1,4 +1,4 @@
-module k8s-pod-info-exporte
+module k8s-pod-info-exporter
 
 go 1.22.5
 

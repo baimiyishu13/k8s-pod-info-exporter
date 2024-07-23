@@ -1,7 +1,7 @@
 package main
 
 import (
-	"k8s-pod-info-exporte/handler"
+	"k8s-pod-info-exporter/handler"
 	"log"
 	"net/http"
 
