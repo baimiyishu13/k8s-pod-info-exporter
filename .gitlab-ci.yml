@@ -2,6 +2,7 @@ stages:
   - build
 
 variables:
+  CGO_ENABLED: 0
   APP_NAME: k8s-pod-info-exporter
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$APP_NAME:$CI_COMMIT_REF_NAME
 
