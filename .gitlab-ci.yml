@@ -1,20 +1,9 @@
 stages:
   - build
-  - deploy
 
 variables:
   APP_NAME: k8s-pod-info-exporter
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$APP_NAME:$CI_COMMIT_REF_NAME
-
-build:
-  stage: build
-  image: golang:1.22.5
-  script:
-    - go mod download
-    - go build -o k8s-pod-info-exporter ./main.go
-  artifacts:
-    paths:
-      - k8s-pod-info-exporter
 
 docker_build:
   stage: deploy

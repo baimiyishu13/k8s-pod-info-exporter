@@ -115,7 +115,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 使用指定参数执行k8s-resource-exporter命令
-	cmd := exec.Command("./bin/k8s-resource-exporter-mac", "--config", relPath, "--output", outputDir)
+	cmd := exec.Command("./bin/k8s-resource-exporter", "--config", relPath, "--output", outputDir)
 	err = cmd.Run()
 	if err != nil {
 		log.Printf("Error executing command: %v", err)

@@ -1,23 +1,37 @@
+# 第一阶段：构建 Go 应用程序
 FROM golang:1.22.5 AS builder
+
 WORKDIR /app
+
 COPY go.mod go.sum ./
 RUN go mod download
-COPY . .
-RUN go build -o k8s-pod-info-exporter ./cmd
 
-FROM debian:bullseye-slim
-RUN apt-get update && apt-get install -y ca-certificates wget tar && rm -rf /var/lib/apt/lists/*
-RUN useradd -m appuser
+COPY . .
+# 禁用 CGO，构建与 Alpine 兼容的二进制文件
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o k8s-pod-info-exporter ./cmd
+
+# 第二阶段：创建最终镜像
+FROM alpine:latest
+
 WORKDIR /app
 
-# Create bin directory and download/extract the tarball
-RUN mkdir -p /app/k8s-pod-info-exporter/bin
-RUN wget -O /app/k8s-pod-info-exporter/bin/k8s-resource-exporter-mac.tar.gz https://gitlab.com/baimiyishu13/k8s-resourc-exporter/-/jobs/7402538260/artifacts/raw/k8s-resource-exporter-mac.tar.gz
-RUN tar -xzf /app/k8s-pod-info-exporter/bin/k8s-resource-exporter-mac.tar.gz -C /app/k8s-pod-info-exporter/bin
+# 安装 wget 和 ca-certificates
+RUN apk add --no-cache wget ca-certificates
 
-COPY --from=builder /app/k8s-pod-info-exporter /app/k8s-pod-info-exporter
-COPY templates /app/templates
-RUN chown -R appuser /app
-USER appuser
-ENTRYPOINT ["/app/k8s-pod-info-exporter"]
+# 复制第一阶段构建的二进制文件
+COPY --from=builder /app/k8s-pod-info-exporter .
+COPY . .
+# 确认文件存在并具有执行权限
+RUN ls -l /app/k8s-pod-info-exporter
+RUN chmod +x /app/k8s-pod-info-exporter
+RUN ls -l /app/k8s-pod-info-exporter
+
+# 下载和解压 k8s-resource-exporter
+RUN mkdir -p bin \
+    && wget -O bin/k8s-resource-exporter-adm64.tar.gz https://gitlab.com/baimiyishu13/k8s-resourc-exporter/-/jobs/7402538260/artifacts/raw/k8s-resource-exporter-adm64.tar.gz \
+    && tar -xzf bin/k8s-resource-exporter-adm64.tar.gz -C bin \
+    && mv bin/k8s-resource-exporter-adm64 bin/k8s-resource-exporter \
+    && rm -f bin/k8s-resource-exporter-adm64.tar.gz
+
+ENTRYPOINT ["./k8s-pod-info-exporter"]
 EXPOSE 8080
