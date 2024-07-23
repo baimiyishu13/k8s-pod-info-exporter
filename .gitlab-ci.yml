@@ -7,7 +7,7 @@ variables:
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$APP_NAME:$CI_COMMIT_REF_NAME
 
 docker_build:
-  stage: deploy
+  stage: build
   image: docker:latest
   services:
     - docker:dind
