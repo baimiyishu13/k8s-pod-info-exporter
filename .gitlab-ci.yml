@@ -1,0 +1,32 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  APP_NAME: k8s-pod-info-exporter
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$APP_NAME:$CI_COMMIT_REF_NAME
+
+build:
+  stage: build
+  image: golang:1.22.5
+  script:
+    - go mod download
+    - go build -o k8s-pod-info-exporter ./main.go
+  artifacts:
+    paths:
+      - k8s-pod-info-exporter
+
+docker_build:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t $DOCKER_IMAGE .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $DOCKER_IMAGE
+  only:
+    - main
+  tags:
+    - local
+    - mac

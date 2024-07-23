@@ -1,0 +1,20 @@
+# Ignore Go build artifacts
+k8s-resource-exporter
+*.csv
+
+./bin/
+# Other common ignore patterns
+*.log
+*.tmp
+*.out
+
+# Ignore directories
+vendor/
+node_modules/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
