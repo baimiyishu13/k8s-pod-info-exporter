@@ -2,12 +2,12 @@
 k8s-resource-exporter
 *.csv
 
-./bin/*
 # Other common ignore patterns
 *.log
 *.tmp
 *.out
 
+bin
 # Ignore directories
 vendor/
 node_modules/
